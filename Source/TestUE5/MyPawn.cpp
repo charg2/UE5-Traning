@@ -39,8 +39,8 @@ void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis( TEXT( "UpDown" ), this, &AMyPawn::UpDown );
-	PlayerInputComponent->BindAxis( TEXT( "LeftRight" ), this, &AMyPawn::LeftRight );
+	// PlayerInputComponent->BindAxis( TEXT( "UpDown" ), this, &AMyPawn::UpDown );
+	// PlayerInputComponent->BindAxis( TEXT( "LeftRight" ), this, &AMyPawn::LeftRight );
 }
 
 void AMyPawn::UpDown( float Value )
