@@ -26,13 +26,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
     void UpDown( float Value );
 	void LeftRight( float Value );
 	void Yaw( float Value );
-
+	void Attack();
 
 private:
 	UPROPERTY( VisibleAnywhere )

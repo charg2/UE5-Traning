@@ -3,6 +3,7 @@
 
 #include "MyCharacter.h"
 
+#include "MyAnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -43,18 +44,21 @@ void AMyCharacter::Tick(float DeltaTime)
 
 }
 
+
 // Called to bind functionality to input
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction( TEXT( "Jump" ), IE_Pressed, this, &AMyCharacter::Jump );
+	PlayerInputComponent->BindAction( TEXT( "Attack" ), IE_Pressed, this, &AMyCharacter::Attack );
 
 
 	PlayerInputComponent->BindAxis( TEXT( "UpDown" ), this, &AMyCharacter::UpDown );
 	PlayerInputComponent->BindAxis( TEXT( "LeftRight" ), this, &AMyCharacter::LeftRight );
 	PlayerInputComponent->BindAxis( TEXT( "Yaw" ), this, &AMyCharacter::Yaw );
 }
+
 
 void AMyCharacter::UpDown( float Value )
 {
@@ -77,3 +81,11 @@ void AMyCharacter::Yaw( float Value )
 	AddControllerYawInput( Value );
 }
 
+void AMyCharacter::Attack()
+{
+	auto animInstance = Cast< UMyAnimInstance >( GetMesh()->GetAnimInstance() );
+	if ( !animInstance )
+		return;
+
+	animInstance->PlayAttackMontage();
+}
