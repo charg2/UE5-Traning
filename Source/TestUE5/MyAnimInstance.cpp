@@ -30,8 +30,5 @@ void UMyAnimInstance::NativeUpdateAnimation( float InDeltaSeconds )
 
 void UMyAnimInstance::PlayAttackMontage()
 {
-    if ( Montage_IsPlaying( AttackMontage ) )
-        return;
-
     Montage_Play( AttackMontage, 1.f );
 }

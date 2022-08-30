@@ -34,7 +34,13 @@ AMyCharacter::AMyCharacter()
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+
+	AnimInstance = Cast< UMyAnimInstance >( GetMesh()->GetAnimInstance() );
+	if ( !AnimInstance )
+		return;
+
+	AnimInstance->OnMontageEnded.AddDynamic( this, &AMyCharacter::OnAttackMontageEnded );
 }
 
 // Called every frame
@@ -83,9 +89,15 @@ void AMyCharacter::Yaw( float Value )
 
 void AMyCharacter::Attack()
 {
-	auto animInstance = Cast< UMyAnimInstance >( GetMesh()->GetAnimInstance() );
-	if ( !animInstance )
+	if ( IsAttacking )
 		return;
 
-	animInstance->PlayAttackMontage();
+	AnimInstance->PlayAttackMontage();
+
+	IsAttacking = true;
+}
+
+void AMyCharacter::OnAttackMontageEnded( UAnimMontage* InMontage, bool InInterrupted )
+{
+	IsAttacking = false;
 }
