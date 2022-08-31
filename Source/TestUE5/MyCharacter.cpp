@@ -6,6 +6,7 @@
 #include "MyAnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -34,20 +35,24 @@ AMyCharacter::AMyCharacter()
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
+void AMyCharacter::PostInitializeComponents()
+{
+    Super::PostInitializeComponents();
 
 	AnimInstance = Cast< UMyAnimInstance >( GetMesh()->GetAnimInstance() );
 	if ( !AnimInstance )
 		return;
 
 	AnimInstance->OnMontageEnded.AddDynamic( this, &AMyCharacter::OnAttackMontageEnded );
+	AnimInstance->OnAttackHit.AddUObject( this, &AMyCharacter::AttackCheck );
 }
 
 // Called every frame
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 
@@ -59,7 +64,6 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction( TEXT( "Jump" ), IE_Pressed, this, &AMyCharacter::Jump );
 	PlayerInputComponent->BindAction( TEXT( "Attack" ), IE_Pressed, this, &AMyCharacter::Attack );
 
-
 	PlayerInputComponent->BindAxis( TEXT( "UpDown" ), this, &AMyCharacter::UpDown );
 	PlayerInputComponent->BindAxis( TEXT( "LeftRight" ), this, &AMyCharacter::LeftRight );
 	PlayerInputComponent->BindAxis( TEXT( "Yaw" ), this, &AMyCharacter::Yaw );
@@ -68,17 +72,20 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AMyCharacter::UpDown( float Value )
 {
-	if ( Value == 0.0f )
-		return;
+	//if ( Value == 0.0f )
+	//	return;
+
+	UpDownValue = Value;
 
 	AddMovementInput( GetActorForwardVector(), Value );
 }
 
 void AMyCharacter::LeftRight( float Value )
 {
-	if ( Value == 0.0f )
-		return;
+	//if ( Value == 0.0f )
+		//return;
 
+	LeftRightValue = Value;
 	AddMovementInput( GetActorRightVector(), Value );
 }
 
@@ -93,8 +100,38 @@ void AMyCharacter::Attack()
 		return;
 
 	AnimInstance->PlayAttackMontage();
+	AnimInstance->JumpToSection( AttackIndex );
+
+	AttackIndex = ( AttackIndex + 1 ) % 3;
 
 	IsAttacking = true;
+}
+
+/**
+ * @brief 공격시 충돌을 체크합니다.
+ */
+void AMyCharacter::AttackCheck()
+{
+	FHitResult hitResult;
+	FCollisionQueryParams params( NAME_None, false, this );
+
+	float attackRange = 100.f;
+	float attackRadius = 50.f;
+
+	// 채널을 이용하여 스위핑 하겠다.
+	bool result = GetWorld()->SweepSingleByChannel(
+		OUT hitResult,
+		GetActorLocation(),
+		GetActorLocation() + GetActorForwardVector() * attackRange,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel2,
+		FCollisionShape::MakeSphere( attackRadius ),
+		params );
+
+	if ( result && IsValid( hitResult.GetActor() ) )
+	{
+		UE_LOG( LogTemp, Log, TEXT( "Hit Actor: %s" ), *hitResult.GetActor()->GetName() );
+	}
 }
 
 void AMyCharacter::OnAttackMontageEnded( UAnimMontage* InMontage, bool InInterrupted )

@@ -19,8 +19,10 @@ public:
 	AMyCharacter();
 
 protected:
+ 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+    virtual void PostInitializeComponents();
 
 public:	
 	// Called every frame
@@ -34,6 +36,7 @@ public:
 	void LeftRight( float Value );
 	void Yaw( float Value );
 	void Attack();
+	void AttackCheck();
 
 	UFUNCTION()
 	void OnAttackMontageEnded( UAnimMontage* InMontage, bool InInterrupted );
@@ -50,4 +53,14 @@ private:
 
 	UPROPERTY()
 	class UMyAnimInstance* AnimInstance;
+
+	UPROPERTY()
+    int32 AttackIndex = 0;
+
+public:
+	UPROPERTY()
+	float UpDownValue = 0;
+
+	UPROPERTY()
+    float LeftRightValue = 0;
 };
