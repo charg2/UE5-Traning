@@ -128,10 +128,27 @@ void AMyCharacter::AttackCheck()
 		FCollisionShape::MakeSphere( attackRadius ),
 		params );
 
+	FVector vec    = GetActorForwardVector() * attackRange;
+	FVector center = GetActorLocation() + vec * 0.5f;
+	float halfHeight = attackRange * .5f + attackRadius;
+	FQuat rotation = FRotationMatrix::MakeFromZ( vec ).ToQuat();
+	FColor drawColor;
+	if ( result )
+		drawColor = FColor::Green;
+	else
+		drawColor = FColor::Red;
+
+	DrawDebugCapsule( GetWorld()
+		,center
+		,halfHeight
+		,attackRadius
+		,rotation
+		,drawColor
+		,false
+		,0.2f );
+
 	if ( result && IsValid( hitResult.GetActor() ) )
-	{
 		UE_LOG( LogTemp, Log, TEXT( "Hit Actor: %s" ), *hitResult.GetActor()->GetName() );
-	}
 }
 
 void AMyCharacter::OnAttackMontageEnded( UAnimMontage* InMontage, bool InInterrupted )
