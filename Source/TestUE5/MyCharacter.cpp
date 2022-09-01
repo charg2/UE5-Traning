@@ -7,6 +7,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/StaticMeshSocket.h"
+#include "MyWeapon.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -29,12 +31,36 @@ AMyCharacter::AMyCharacter()
 	static ConstructorHelpers::FObjectFinder< USkeletalMesh > SM( TEXT( "SkeletalMesh'/Game/ParagonGreystone/Characters/Heroes/Greystone/Meshes/Greystone.Greystone'" ) );
 	if ( SM.Succeeded() )
 		GetMesh()->SetSkeletalMesh( SM.Object );
+
+	//FName weaponSocket( TEXT( "hand_l_socket" ) );
+	//if ( GetMesh()->DoesSocketExist( weaponSocket ) )
+	//{
+
+	//	Weapon = CreateDefaultSubobject< UStaticMeshComponent >( TEXT( "WEAPON" ) );
+
+	//	static ConstructorHelpers::FObjectFinder< UStaticMesh > SW( TEXT( "StaticMesh'/Game/ParagonGreystone/FX/Meshes/Heroes/Greystone/SM_Greystone_Blade_01.SM_Greystone_Blade_01'" ) );
+	//	if ( SW.Succeeded() )
+	//		Weapon->SetStaticMesh( SW.Object );
+
+	//	Weapon->SetupAttachment( GetMesh(), weaponSocket );
+	//}
+
 }
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FName weaponSocket( TEXT( "hand_l_socket" ) );
+
+	auto weapon = GetWorld()->SpawnActor< AMyWeapon >( FVector::ZeroVector, FRotator::ZeroRotator );
+	if ( !weapon )
+		return;
+
+	weapon->AttachToComponent( GetMesh(),
+		FAttachmentTransformRules::SnapToTargetIncludingScale,
+		weaponSocket );
 }
 
 void AMyCharacter::PostInitializeComponents()
@@ -68,7 +94,6 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis( TEXT( "LeftRight" ), this, &AMyCharacter::LeftRight );
 	PlayerInputComponent->BindAxis( TEXT( "Yaw" ), this, &AMyCharacter::Yaw );
 }
-
 
 void AMyCharacter::UpDown( float Value )
 {
@@ -132,11 +157,7 @@ void AMyCharacter::AttackCheck()
 	FVector center = GetActorLocation() + vec * 0.5f;
 	float halfHeight = attackRange * .5f + attackRadius;
 	FQuat rotation = FRotationMatrix::MakeFromZ( vec ).ToQuat();
-	FColor drawColor;
-	if ( result )
-		drawColor = FColor::Green;
-	else
-		drawColor = FColor::Red;
+	FColor drawColor = result ? FColor::Green : FColor::Red;
 
 	DrawDebugCapsule( GetWorld()
 		,center
