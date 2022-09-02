@@ -17,33 +17,21 @@ AMyCharacter::AMyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArm = CreateDefaultSubobject< USpringArmComponent >( TEXT( "SPRINGARM" ) );
-	Camera = CreateDefaultSubobject< UCameraComponent >( TEXT( "CAMERA" ) );
+		Camera = CreateDefaultSubobject< UCameraComponent >( TEXT( "CAMERA" ) );
 
 	SpringArm->SetupAttachment( GetCapsuleComponent() );
 	Camera->SetupAttachment( SpringArm );
 
 	SpringArm->TargetArmLength = 500.f;
-	SpringArm->SetRelativeRotation( FRotator{ -35.f, 0.f, 0.f } );
+	SpringArm->SetRelativeRotation( { -35.f, 0.f, 0.f } );
 
-	GetMesh()->SetRelativeLocationAndRotation( FVector{ 0.f, 0.0f, -88.f }, 
-		FRotator{ 0.f, -90.f, 0.f } );
+	GetMesh()->SetRelativeLocationAndRotation( { 0.f, 0.0f, -88.f }, 
+		{ 0.f, -90.f, 0.f } );
 
 	static ConstructorHelpers::FObjectFinder< USkeletalMesh > SM( TEXT( "SkeletalMesh'/Game/ParagonGreystone/Characters/Heroes/Greystone/Meshes/Greystone.Greystone'" ) );
 	if ( SM.Succeeded() )
 		GetMesh()->SetSkeletalMesh( SM.Object );
 
-	//FName weaponSocket( TEXT( "hand_l_socket" ) );
-	//if ( GetMesh()->DoesSocketExist( weaponSocket ) )
-	//{
-
-	//	Weapon = CreateDefaultSubobject< UStaticMeshComponent >( TEXT( "WEAPON" ) );
-
-	//	static ConstructorHelpers::FObjectFinder< UStaticMesh > SW( TEXT( "StaticMesh'/Game/ParagonGreystone/FX/Meshes/Heroes/Greystone/SM_Greystone_Blade_01.SM_Greystone_Blade_01'" ) );
-	//	if ( SW.Succeeded() )
-	//		Weapon->SetStaticMesh( SW.Object );
-
-	//	Weapon->SetupAttachment( GetMesh(), weaponSocket );
-	//}
 
 }
 
@@ -61,6 +49,8 @@ void AMyCharacter::BeginPlay()
 	weapon->AttachToComponent( GetMesh(),
 		FAttachmentTransformRules::SnapToTargetIncludingScale,
 		weaponSocket );
+
+	auto weapon1 = GetWorld()->SpawnActor< AMyWeapon >( FVector::ZeroVector, FRotator::ZeroRotator );
 }
 
 void AMyCharacter::PostInitializeComponents()
@@ -133,7 +123,7 @@ void AMyCharacter::Attack()
 }
 
 /**
- * @brief °ø°Ý½Ã Ãæµ¹À» Ã¼Å©ÇÕ´Ï´Ù.
+ * @brief ï¿½ï¿½ï¿½Ý½ï¿½ ï¿½æµ¹ï¿½ï¿½ Ã¼Å©ï¿½Õ´Ï´ï¿½.
  */
 void AMyCharacter::AttackCheck()
 {
@@ -143,7 +133,7 @@ void AMyCharacter::AttackCheck()
 	float attackRange = 100.f;
 	float attackRadius = 50.f;
 
-	// Ã¤³ÎÀ» ÀÌ¿ëÇÏ¿© ½ºÀ§ÇÎ ÇÏ°Ú´Ù.
+	// Ã¤ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï°Ú´ï¿½.
 	bool result = GetWorld()->SweepSingleByChannel(
 		OUT hitResult,
 		GetActorLocation(),

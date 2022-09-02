@@ -19,8 +19,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void PostInitializeComponents() override;
+
+
 public:
+	UFUNCTION()
+    void OnCharacterOverlap( UPrimitiveComponent* PrimitiveComponent, AActor* Actor, UPrimitiveComponent* PrimitiveComponent1, int I, bool bArg, const FHitResult& HitResult );
+
 
     UPROPERTY( VisibleAnywhere )
 	class UStaticMeshComponent* Weapon;
+
+	UPROPERTY( VisibleAnywhere )
+    class UBoxComponent* Trigger;
 };
