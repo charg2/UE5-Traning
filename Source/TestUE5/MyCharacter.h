@@ -41,6 +41,13 @@ public:
 	UFUNCTION()
 	void OnAttackMontageEnded( UAnimMontage* InMontage, bool InInterrupted );
 
+    virtual float TakeDamage( 
+		float               DamageAmount, 
+		FDamageEvent const& DamageEvent, 
+		AController*        EventInstigator,
+		AActor*             DamageCauser ) override;
+
+
 private:
 	UPROPERTY( VisibleAnywhere )
 	USpringArmComponent* SpringArm;
@@ -66,4 +73,7 @@ public:
 
 	UPROPERTY( VisibleAnywhere )
 	class UStaticMeshComponent* Weapon;
+
+	UPROPERTY( VisibleAnywhere )
+    class UMyStatComponent* Stat;
 };

@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "DrawDebugHelpers.h"
+#include "MyStatComponent.h"
 #include "Engine/StaticMeshSocket.h"
 #include "MyWeapon.h"
 
@@ -32,6 +33,7 @@ AMyCharacter::AMyCharacter()
 	if ( SM.Succeeded() )
 		GetMesh()->SetSkeletalMesh( SM.Object );
 
+	Stat = CreateDefaultSubobject< UMyStatComponent >( TEXT( "STAT" ) );
 
 }
 
@@ -159,10 +161,27 @@ void AMyCharacter::AttackCheck()
 		,0.2f );
 
 	if ( result && IsValid( hitResult.GetActor() ) )
-		UE_LOG( LogTemp, Log, TEXT( "Hit Actor: %s" ), *hitResult.GetActor()->GetName() );
+	{
+	    UE_LOG( LogTemp, Log, TEXT( "Hit Actor: %s" ), *hitResult.GetActor()->GetName() );
+
+		FDamageEvent damageEvent;
+		hitResult.GetActor()->TakeDamage( Stat->GetAttack(), damageEvent, GetController(), this );
+	}
+
 }
 
 void AMyCharacter::OnAttackMontageEnded( UAnimMontage* InMontage, bool InInterrupted )
 {
 	IsAttacking = false;
+}
+
+float AMyCharacter::TakeDamage( 
+	float               DamageAmount, 
+	FDamageEvent const& DamageEvent, 
+	AController*        EventInstigator,
+    AActor*             DamageCauser )
+{
+	Stat->OnAttacked( DamageAmount );
+
+	return DamageAmount;
 }
