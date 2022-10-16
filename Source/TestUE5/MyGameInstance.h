@@ -37,7 +37,14 @@ public:
 
 	FMyCahracterData* GetStatData( int32 Level );
 
+	static UMyGameInstance* GetInstance();
+
 private:
 	UPROPERTY()
     class UDataTable* MyStats;
 };
+
+inline UMyGameInstance& GetMyGameInstance()
+{
+	return *UMyGameInstance::GetInstance();
+}

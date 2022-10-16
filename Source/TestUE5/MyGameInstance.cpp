@@ -8,7 +8,6 @@ UMyGameInstance::UMyGameInstance()
     static ConstructorHelpers::FObjectFinder< UDataTable > DATA( TEXT( "DataTable'/Game/Data/StatTable.StatTable'") );
 
     MyStats = DATA.Object;
-
 }
 
 void UMyGameInstance::Init()
@@ -21,4 +20,16 @@ void UMyGameInstance::Init()
 FMyCahracterData* UMyGameInstance::GetStatData( int32 Level )
 {
     return MyStats->FindRow< FMyCahracterData >( *FString::FromInt( Level ), TEXT( "" ) );
+}
+
+UMyGameInstance* UMyGameInstance::GetInstance()
+{
+    if ( !GEngine )
+        return nullptr;
+
+    const FWorldContext* context = GEngine->GetWorldContextFromGameViewport( GEngine->GameViewport );
+    if ( !context )
+        return nullptr;
+
+    return Cast< UMyGameInstance >( context->OwningGameInstance );
 }
