@@ -1,15 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MyCharacter.h"
+
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/WidgetComponent.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/StaticMeshSocket.h"
+#include "UObject/ConstructorHelpers.h"
 
 #include "MyAnimInstance.h"
-#include "Components/SkeletalMeshComponent.h"
-#include "UObject/ConstructorHelpers.h"
-#include "DrawDebugHelpers.h"
-#include "MyStatComponent.h"
-#include "Engine/StaticMeshSocket.h"
+#include "MyCharacter.h"
+#include "MyCharacterWidget.h"
 #include "MyWeapon.h"
+#include "MyStatComponent.h"
+
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -34,6 +38,17 @@ AMyCharacter::AMyCharacter()
 		GetMesh()->SetSkeletalMesh( SM.Object );
 
 	Stat = CreateDefaultSubobject< UMyStatComponent >( TEXT( "STAT" ) );
+
+	HPBar = CreateDefaultSubobject< UWidgetComponent >( TEXT( "HPBAR" ) );
+	HPBar->SetupAttachment( GetMesh() );
+	HPBar->SetWidgetSpace( EWidgetSpace::Screen );
+
+	static ConstructorHelpers::FClassFinder< UUserWidget > UW( TEXT( "WidgetBlueprint'/Game/UI/WBP_HPBar.WBP_HPBar_C'" ) );
+	if ( UW.Succeeded() )
+	{
+		HPBar->SetWidgetClass( UW.Class );
+		HPBar->SetDrawSize( { 200.f, 50.f } );
+	}
 
 }
 
@@ -65,6 +80,8 @@ void AMyCharacter::PostInitializeComponents()
 
 	AnimInstance->OnMontageEnded.AddDynamic( this, &AMyCharacter::OnAttackMontageEnded );
 	AnimInstance->OnAttackHit.AddUObject( this, &AMyCharacter::AttackCheck );
+
+	HPBar->InitWidget();
 }
 
 // Called every frame
